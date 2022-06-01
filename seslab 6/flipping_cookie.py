@@ -1,19 +1,26 @@
 '''
-decrypt(CT) ^ iv ^ 'admin=False' 'admin=True;' = 'admin=False' ^ 'admin=False' ^ 'admin=True;'
+iv ^ dec = False    what is there
+x  ^ dec = True;    what we want
+x is what iv should be to give us True;
+
+dec = iv ^ False
+dec = x ^ True;
+iv ^ False = x ^ True;
+x = iv ^ False ^ True;
 '''
 
 import requests
 from pwn import xor
 
-cookie = requests.get('http://aes.cryptohack.org/flipping_cookie/get_cookie').json()['cookie']
+cookie = requests.get('http://aes.cryptohack.org/flipping_cookie/get_cookie').json()['cookie']  
 cookie = bytes.fromhex(cookie)
 
 iv = cookie[:16]
 cookie = cookie[16:]
 
-iv = xor(iv, b'admin=False;expi', b'admin=True;aaaaa')
+x = xor(iv, b'admin=False;expi', b'admin=True;expir')
 
-print(requests.get('http://aes.cryptohack.org/flipping_cookie/check_admin/{}/{}/'.format(cookie.hex(), iv.hex())).json())
+print(requests.get('http://aes.cryptohack.org/flipping_cookie/check_admin/{}/{}/'.format(cookie.hex(), x.hex())).json())
 
 
 
